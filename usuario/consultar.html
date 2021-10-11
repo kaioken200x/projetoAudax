@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+	<meta charset="utf-8">
+	<title>Almoxarifado</title>
+    <link rel="stylesheet" href="../assets/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../assets/css/styles.css" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <script src="../assets/js/bootstrap.min.js"></script>
+    <script src="../assets/js/jquery-3.6.0.js"></script>
+    <script src="../assets/js/global-funcoes.js"></script>
+
+	<script type="text/javascript">
+		$(function () {
+            validarPerfil("operacional/inicio.html");
+            CarregaUsusario("usuario/consultar.html");
+            validarPerfil("usuario/consultar.html", "load-div", "menu-div");
+       
+        });
+
+       /* function confirmaSituacao(Pag, Param, situacao)
+        {
+            if(confirm("Deseja alterar o status desse registro?"))
+            {
+                RedirecionaPagina(Pag, Param);
+            }
+        }*/
+
+        function AtualizaUsuario(codigo) {
+            
+            window.location='cadastrar.html?codigo='+codigo;
+
+            
+
+        }
+        function RemoveUsuario(codigo) {
+
+            var dados = "&codigo="+codigo;
+            $.ajax({
+                type: "POST",
+                //url: "usuario/consultar.html",
+                url: "../metodos/metodos.php",
+                data: "metodo=RemoveUsuario"+dados,
+                beforeSend: function()
+                {
+                    $("#div_load").show();
+                },
+                success: function (retorno) {
+                    console.log(retorno);
+                    var arRetorno = JSON.parse(retorno.trim())
+                    
+                    if (arRetorno[0] = 1){
+                        alert(arRetorno[1]);
+                        CarregaUsusario();     
+                    }
+                    else{
+                        alert(arRetorno[1]);
+                        //reload.("consultar.html");
+                    }
+                },
+                error: function (request, status, errorThrown) {
+                    alert("Erro!");
+                    //console.log(xhr.status);
+                    console.error(xhr.responseText);
+                    console.error(thrownError);
+                }
+            });
+            
+        }
+      
+        function Filtrar() {
+
+            var filtro_usuario = $("#filtro_usuario").val();
+            var dados = "&descricao="+filtro_usuario;
+            $.ajax({
+                type: "POST",
+                //url: "usuario/consultar.html",
+                url: "../metodos/metodos.php",
+                data: "metodo=FiltrarUsuario"+dados,
+                beforeSend: function()
+                {
+                    $("#div_load").show();
+                },
+                success: function (retorno) {
+                    console.log(retorno);
+                    //var arRetorno = JSON.parse(retorno.trim())
+                    
+           	    	if (retorno != ""){
+                        $("#table-dados").html(retorno);       
+                    }
+                    else{
+
+                    }
+                    /*try {
+                        if (parseInt(arRetorno[0]) == 1) {
+                            alert(arRetorno[1]);
+                            window.location.replace("consultar.html");
+                        } else {
+                            alert(arRetorno[1]);
+                        }
+                    } catch (e) {
+                        alert("Ops! Não foi possível realizar a ação.");
+                        console.error(e);
+                    }*/
+                },
+                error: function (request, status, errorThrown) {
+                    alert("Erro!");
+                    //console.log(xhr.status);
+                    console.error(xhr.responseText);
+                    console.error(thrownError);
+                }
+            });
+
+        }
+      
+        function CarregaUsusario() {
+
+            //var filtro_usuario = $("#filtro_usuario").val();
+            
+            //var dados = "&nome_ususario="+filtro_usuario;
+
+            $.ajax({
+                type: "POST",
+                //url: "usuario/consultar.html",
+                url: "../metodos/metodos.php",
+                data: "metodo=CarregaUsusario",
+                beforeSend: function()
+                {
+                    $("#div_load").show();
+                },
+                success: function (retorno) {
+                    console.log(retorno);
+                    //var arRetorno = JSON.parse(retorno.trim())
+                    
+           	    	if (retorno != ""){
+                        $("#table-dados").html(retorno);       
+                    }
+                },
+                error: function (request, status, errorThrown) {
+                    alert("Erro!");
+                    //console.log(xhr.status);
+                    console.error(xhr.responseText);
+                    console.error(thrownError);
+                }
+            });
+
+
+        }
+	</script>
+</head>
+<body>
+    <!-- <?php include("../includes/menu.php");?> -->
+    <div class="d-flex" id="wrapper">
+        <div class="border-end bg-white" id="sidebar-wrapper">
+            <div id="menu-div" class="list-group list-group-flush"></div>
+        </div>
+
+        <div id="page-content-wrapper">
+            <div class="container-fluid">
+                <section class="section-conteudo">
+                    <form>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <h3 class="titulo-header">Usuários</h3>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <input class="input-pesquisou" id="filtro_usuario" placeholder="Digite o que você quer encontrar">
+                                <span class="glyphicon glyphicon-search" name="filtrar" id="filtrar" onclick="Filtrar();"></span>
+                            </div>
+                            <div class="col-md-5" style="text-align:right;">
+                                <a class="btn btn-primary" href="cadastrar.html">Novo usuário</a>
+                            </div>
+                        </div>
+                        <div class="row" style="margin-top: 20px;">
+                            <div class="col-md-12">
+                                <table class="table table-bordered">
+                                    <tr>
+                                        <th>Nome</th>
+                                        <th>E-mail</th>
+                                        <th>Função</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                    <tbody id="table-dados">
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </form>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <div id="load-div"></div>  
+
+</body>
+</html>

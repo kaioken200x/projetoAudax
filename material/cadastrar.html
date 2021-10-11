@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="utf-8">
+    <title>Almoxarifado</title>
+
+    <link rel="stylesheet" href="../assets/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="../assets/css/styles.css" />
+
+    <script src="../assets/js/bootstrap.min.js"></script>
+    <script src="../assets/js/jquery-3.6.0.js"></script>
+    <script src="../assets/js/global-funcoes.js"></script>
+    <script src="../assets/js/scripts.js"></script>
+
+    <script type="text/javascript">
+        $(function () {
+            $("#load-div").hide();
+
+            validarPerfil("material/cadastrar.html", "load-div", "menu-div");
+
+            carregarPerfis();
+        });
+
+        function carregarPerfis() {
+
+        }
+
+        function CadastrarMaterial() {
+            var produto = $("#produto").val().trim();
+
+            if (produto == "") {
+                alert("Descreva o Produto!");
+                $("#produto").focus();
+                return false;
+            }
+            const urlParams = new URLSearchParams(window.location.search);
+            var codigo = '';
+            
+            if (urlParams != null && urlParams != undefined) {
+                const myParam = urlParams.get('codigo');
+                if (myParam != null && myParam != undefined) {
+                    codigo = myParam;
+                }
+            }  
+
+            var parametros = {
+                "metodo": "CadastrarMaterial",
+                "produto": produto,
+                "codigo": codigo,
+            };
+
+            $.ajax({
+                type: "POST",
+               // url: "../src/api/usuario.php",
+                url: "../metodos/metodos.php",
+                data: parametros,
+                beforeSend: function () {
+                    $("#div_load").show();
+                },
+                success: function (retorno) {
+                    console.log(retorno);
+                    var arRetorno = JSON.parse(retorno.trim())
+                    try {
+                        if (parseInt(arRetorno[0]) == 1) {
+                            alert(arRetorno[1]);
+                            window.location.replace("consultar.html");
+                        } else {
+                            alert(arRetorno[1]);
+                        }
+                    } catch (e) {
+                        alert("Ops! Não foi possível realizar a ação.");
+                        console.error(e);
+                    }
+                },
+                error: function (request, status, errorThrown) {
+                    alert("Erro!");
+                    //console.log(xhr.status);
+                    console.error(xhr.responseText);
+                    console.error(thrownError);
+                }
+            });
+        }
+    </script>
+</head>
+
+<body>
+    <div class="d-flex" id="wrapper">
+        <div class="border-end bg-white" id="sidebar-wrapper">
+            <div id="menu-div" class="list-group list-group-flush"></div>
+        </div>
+
+        <div id="page-content-wrapper">
+            <div class="container-fluid">
+                <section class="section-conteudo">
+                    <form>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <h3 class="titulo-header">Cadastrar Material</h3>
+                            </div>
+                        </div>
+                        <div class="row" style="margin-top: 20px;">
+                            <div class="col-md-6">
+                                <label>Nome</label>
+                                <input class="form-control" placeholder="Informe a descrição" id="produto">
+                            </div>
+                        </div>
+                        <div class="row" style="margin-top: 20px;">
+                            <div class="col-md-11" style="text-align:right;">
+                                <a class="btn btn-default" href="consultar.html">Cancelar</a>
+                                <button type="button" class="btn btn-primary" name="cadastrar"
+                                    onclick="CadastrarMaterial();">Cadastrar Material</button>
+                            </div>
+                        </div>
+                    </form>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <div id="load-div"></div>
+    <script>
+         $(function () {
+            CarregarProduto ();   
+        });
+
+        function CarregarProduto ()
+        {
+            const urlParams = new URLSearchParams(window.location.search);
+            var codigo = 0;
+            
+            if (urlParams != null && urlParams != undefined) {
+                const myParam = urlParams.get('codigo');
+                if (myParam != null && myParam != undefined) {
+                    codigo = myParam;
+                }else{
+                    return false;
+                }
+            }                         
+            var parametros = {
+                "metodo": "CarregarProduto", 
+                "codigo" : codigo,
+            };
+            $.ajax({
+                url: "../metodos/metodos.php",
+                type: "POST",
+                ContentType: 'application/json',
+                data: parametros,
+                beforeSend: function () {
+                    $("#div_load").show();
+                },
+                success: function (ret) {
+                   var  retorno = JSON.parse(ret);
+                    $("#produto").val(retorno.nome);
+
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+                    alert("Ops! Não foi possível completar a requisição.");
+                    //console.log(xhr.status);
+                    console.error(xhr.responseText);
+                    console.error(thrownError);
+                }
+            });
+        }
+    </script>
+</body>
+
+</html>
